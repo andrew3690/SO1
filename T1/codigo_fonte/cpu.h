@@ -5,12 +5,16 @@
 #include <iostream>
 #include "traits.h"
 
+// Trabalho realizado por:
+// André Luiz Souza dos Santos (19150871)
+// Samuel Vieira Bernardo (19200439)
+
 __BEGIN_API
 
 class CPU
 {
     public:
-
+        
         class Context
         {
         private:
@@ -30,13 +34,27 @@ class CPU
             char *_stack;
         public:
             ucontext_t _context;
+
         };
 
     public:
 
         static void switch_context(Context *from, Context *to);
+        
 
 };
+
+// Instanciação de classe Context
+template<typename ... Tn>
+CPU::Context::Context(void (* func)(Tn ...), Tn ... an)
+{
+    getcontext(&_context);
+    _stack = new char[STACK_SIZE];
+    _context.uc_stack.ss_sp = _stack;
+    _context.uc_stack.ss_size = STACK_SIZE;
+    
+    makecontext(&_context, (void (*) ()) func, 1,an ...);
+}
 
 __END_API
 
